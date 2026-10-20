@@ -73,6 +73,7 @@ function Login() {
 
       setError(
         error.response?.data?.message ||
+          error.message ||
           "Invalid email or password."
       );
     } finally {

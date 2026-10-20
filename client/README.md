@@ -1,5 +1,17 @@
 # React + Vite
 
+## API configuration
+
+For local development, run the API on `http://localhost:5000`. Vite proxies
+`/api` requests to that server, so `VITE_API_URL` is optional. To use a
+different API locally, copy `.env.example` to `.env.local` and set
+`VITE_API_URL` to the API origin (without `/api`).
+
+For Vercel, set `VITE_API_URL` in the project's environment variables to the
+deployed backend origin (for example, `https://api.example.com`, without
+`/api`), then redeploy. The backend must allow this site's origin through its
+`CLIENT_URL` setting.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

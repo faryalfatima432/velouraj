@@ -36,6 +36,7 @@ const Products = () => {
 
   const [loading, setLoading] = useState(true);
   const [categoryLoading, setCategoryLoading] = useState(true);
+  const [productsError, setProductsError] = useState("");
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
@@ -132,6 +133,7 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
+      setProductsError("");
 
       const params = {};
 
@@ -173,6 +175,11 @@ const Products = () => {
       );
     } catch (error) {
       console.error("Failed to fetch products:", error);
+      setProductsError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to load products."
+      );
       setProducts([]);
     } finally {
       setLoading(false);
@@ -1019,6 +1026,10 @@ const Products = () => {
                   <ProductSkeleton key={index} />
                 ))}
               </motion.div>
+            ) : productsError ? (
+              <p role="alert" className="rounded-xl bg-red-50 p-6 text-center text-sm text-red-700">
+                {productsError}
+              </p>
             ) : products.length > 0 ? (
               /* PRODUCT GRID */
 

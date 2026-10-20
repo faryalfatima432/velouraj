@@ -147,6 +147,7 @@ function Home() {
 
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [productsError, setProductsError] = useState("");
 
   const [heroIndex, setHeroIndex] = useState(0);
 
@@ -162,6 +163,7 @@ function Home() {
     const fetchProducts = async () => {
       try {
         setLoadingProducts(true);
+        setProductsError("");
 
         const response = await API.get("/products");
 
@@ -172,6 +174,11 @@ function Home() {
         console.error(
           "HOME PRODUCTS ERROR:",
           error.response?.data?.message || error.message
+        );
+        setProductsError(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to load products."
         );
       } finally {
         setLoadingProducts(false);
@@ -535,6 +542,10 @@ function Home() {
 
             {loadingProducts ? (
               <ProductSkeleton />
+            ) : productsError ? (
+              <p role="alert" className="rounded-xl bg-red-50 p-6 text-center text-sm text-red-700">
+                {productsError}
+              </p>
             ) : featuredProducts.length > 0 ? (
               <ProductGrid products={featuredProducts} />
             ) : (

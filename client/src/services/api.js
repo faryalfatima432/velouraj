@@ -24,12 +24,22 @@
 
 import axios from "axios";
 
+const configuredApiUrl = import.meta.env.VITE_API_URL
+  ?.trim()
+  .replace(/\/+$/, "");
+
 const API = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`,
+  baseURL: configuredApiUrl ? `${configuredApiUrl}/api` : "/api",
 });
 
 API.interceptors.request.use(
   (config) => {
+    if (import.meta.env.PROD && !configuredApiUrl) {
+      return Promise.reject(
+        new Error("VITE_API_URL must be configured for the production client.")
+      );
+    }
+
     const token = localStorage.getItem("userToken");
 
     if (token) {

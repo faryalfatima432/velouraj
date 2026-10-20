@@ -10,6 +10,7 @@ import {
   FaShieldAlt,
 } from "react-icons/fa";
 
+import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 function Login() {
@@ -33,7 +34,7 @@ function Login() {
   }, []);
 
   const startSocialLogin = (provider) => {
-    window.location.href = `http://localhost:5000/api/auth/${provider}`;
+    window.location.href = `${API.defaults.baseURL}/auth/${provider}`;
   };
 
   const from = location.state?.from?.pathname || "/";
@@ -66,6 +67,7 @@ function Login() {
     } catch (error) {
       setError(
         error.response?.data?.message ||
+          error.message ||
           "Login failed. Please try again."
       );
     } finally {
