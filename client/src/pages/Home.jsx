@@ -60,7 +60,7 @@ const heroVariants = {
   exit: {
     opacity: 0,
     transition: {
-      duration: 0.35,
+      duration: 0.65,
       ease: "easeInOut",
     },
   },
@@ -150,8 +150,41 @@ function Home() {
   const [productsError, setProductsError] = useState("");
 
   const [heroIndex, setHeroIndex] = useState(0);
+  const [heroImagesReady, setHeroImagesReady] = useState(false);
 
   const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const preloadImages = heroSlides.map(
+      ({ image }) =>
+        new Promise((resolve) => {
+          const preloadedImage = new Image();
+          const resolveAfterDecode = () => {
+            preloadedImage.decode().then(resolve, resolve);
+          };
+
+          preloadedImage.onload = resolveAfterDecode;
+          preloadedImage.onerror = resolve;
+          preloadedImage.src = image;
+
+          if (preloadedImage.complete) {
+            resolveAfterDecode();
+          }
+        })
+    );
+
+    Promise.all(preloadImages).then(() => {
+      if (!cancelled) {
+        setHeroImagesReady(true);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   /*
   ==================================================
@@ -224,6 +257,10 @@ function Home() {
   */
 
   useEffect(() => {
+    if (!heroImagesReady) {
+      return undefined;
+    }
+
     const timer = setInterval(() => {
       setHeroIndex((previous) =>
         previous === heroSlides.length - 1 ? 0 : previous + 1
@@ -231,7 +268,7 @@ function Home() {
     }, 4500);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [heroImagesReady]);
 
   /*
   ==================================================
@@ -286,13 +323,13 @@ function Home() {
 
       <section className="px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8">
         <Reveal className="mx-auto max-w-[1600px]">
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl">
+          <div className="relative overflow-hidden rounded-2xl bg-slate-200 sm:rounded-3xl">
 
             {/* HERO IMAGE ONLY - ORIGINAL LAYOUT PRESERVED */}
 
             <Link
               to="/products"
-              className="block aspect-[1.45/1] overflow-hidden sm:aspect-[2.4/1] lg:aspect-3/1"
+              className="relative block aspect-[1.45/1] overflow-hidden sm:aspect-[2.4/1] lg:aspect-3/1"
             >
               <AnimatePresence mode="sync" initial={false}>
                 <motion.img
@@ -301,9 +338,13 @@ function Home() {
                   alt={currentHero.imageAlt}
                   variants={heroVariants}
                   initial={reduceMotion ? false : "initial"}
-                  animate="animate"
-                  exit="exit"
-                  className="h-full w-full object-cover transition-all duration-700"
+                  animate={reduceMotion ? { opacity: 1 } : "animate"}
+                  exit={
+                    reduceMotion
+                      ? { opacity: 0, transition: { duration: 0 } }
+                      : "exit"
+                  }
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               </AnimatePresence>
             </Link>
@@ -476,25 +517,22 @@ function Home() {
                       ease: "easeOut",
                     }}
                     whileHover={reduceMotion ? undefined : { y: -4 }}
+                    whileTap={reduceMotion ? undefined : { scale: 0.96 }}
                     className="min-w-19 text-center sm:min-w-25"
                   >
                     <Link
                       to={`/products?category=${encodeURIComponent(
                         category.name
                       )}`}
-                      className="group block text-center"
+                      className="group block rounded-xl text-center outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-[#17633a] focus-visible:ring-offset-4 active:scale-95"
                     >
-                      <div className="mx-auto h-20 w-20 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 transition duration-300 group-hover:ring-2 group-hover:ring-[#17633a] sm:h-24 sm:w-24">
+                      <div className="mx-auto h-20 w-20 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200 transition duration-300 group-hover:ring-2 group-hover:ring-[#17633a] group-active:ring-2 group-active:ring-[#17633a] sm:h-24 sm:w-24">
                         {category.image ? (
-                          <motion.img
+                          <img
                             src={category.image}
                             alt={category.name}
                             loading="lazy"
-                            whileHover={
-                              reduceMotion ? undefined : { scale: 1.1 }
-                            }
-                            transition={{ duration: 0.4, ease: "easeOut" }}
-                            className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110 group-active:scale-105 motion-reduce:transition-none"
                             onError={(event) => {
                               event.currentTarget.style.display = "none";
                             }}
