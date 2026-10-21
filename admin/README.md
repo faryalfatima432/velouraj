@@ -9,8 +9,8 @@ different API locally, copy `.env.example` to `.env.local` and set
 
 For Vercel, set `VITE_API_URL` in the project's environment variables to
 `https://velouraj-backend.vercel.app` (without `/api`), then redeploy. Set the
-backend's `ADMIN_URL` to this site's exact deployed origin and redeploy the API
-so browser requests and admin login pass its CORS check.
+backend's `ADMIN_URL` to `https://velouraj-6ets.vercel.app` and redeploy the
+API so browser requests and admin login pass its CORS check.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
