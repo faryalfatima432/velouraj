@@ -156,6 +156,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5174",
 
   // Deployed frontend websites
+  "https://velouraj.vercel.app",
   process.env.CLIENT_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
